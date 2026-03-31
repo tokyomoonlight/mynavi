@@ -3,166 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multiverse - 药酱</title>
+    <title>Command Center - 药酱</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/three@0.154.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.154.0/examples/jsm/loaders/GLTFLoader.js"></script>
+    <script src="https://unpkg.com/@pixiv/three-vrm@2.0.0/lib/three-vrm.js"></script>
     <style>
-        body {
-            background: #0d0d12;
-            color: #e0e0e6;
-            font-family: "Segoe UI", Roboto, sans-serif;
-            overflow-x: hidden;
-        }
-
-        /* 顶部半透明头图 */
-        .hero-section {
-            background: linear-gradient(to bottom, rgba(13, 13, 18, 0.2), #0d0d12),
-                        url('https://images.unsplash.com/photo-1614728263952-84ea206f99b6?q=80&w=2070');
-            background-size: cover;
-            background-position: center;
-            height: 35vh;
-            mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
-        }
-
-        .glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 1rem;
-        }
-
-        /* 分页切换动画 */
-        .page-content { display: none; animation: slideIn 0.4s ease-out; }
-        .page-active { display: block; }
+        :root { --miku-blue: #39c5bb; }
+        body { background: #0a0a0f; color: #e2e8f0; font-family: "Segoe UI", sans-serif; overflow: hidden; }
         
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* 动态背景 */
+        #bg-container {
+            position: fixed; top: 0; left: 0; w-full; h-full; z-index: -2;
+            background-size: cover; background-position: center; transition: background 0.5s ease;
+        }
+        .bg-overlay {
+            position: fixed; top: 0; left: 0; w-full; h-full; z-index: -1;
+            background: linear-gradient(180deg, rgba(10,10,15,0.2) 0%, rgba(10,10,15,0.8) 100%);
         }
 
-        /* 术力口霓虹色 */
-        .miku-blue { color: #39c5bb; }
-        .miku-border { border-color: #39c5bb; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .nav-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .nav-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.1); border-color: var(--miku-blue); }
+        
+        /* VRM 容器 */
+        #vrm-container { position: fixed; bottom: 0; right: 0; width: 50vw; height: 80vh; z-index: 5; pointer-events: none; }
+        
+        .page-content { display: none; animation: fadeIn 0.5s ease; }
+        .page-active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 隐藏滚动条 */
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <div class="hero-section absolute top-0 w-full z-0"></div>
+    <div id="bg-container" style="background-image: url('https://images.unsplash.com/photo-1475274047050-1d0c0975c63e?q=80&w=2070');"></div>
+    <div class="bg-overlay"></div>
 
-    <div class="relative z-10 pt-20 px-6 max-w-6xl mx-auto">
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-3xl font-black tracking-tighter miku-blue italic">COMMAND_CENTER.v3</h1>
-            <nav class="flex gap-4 glass px-4 py-2 text-xs font-bold uppercase tracking-widest">
-                <button onclick="showPage(0)" class="hover:text-blue-400 transition-colors">HOME</button>
-                <button onclick="showPage(1)" class="hover:text-blue-400 transition-colors">KANBAN</button>
-                <button onclick="showPage(2)" class="hover:text-blue-400 transition-colors">VOCALOID</button>
+    <div id="vrm-container"></div>
+
+    <div class="fixed top-0 w-full z-50 flex justify-between items-center px-10 py-4">
+        <div class="flex gap-6 text-xs font-bold tracking-tighter opacity-70">
+            <a href="https://mail.google.com" target="_blank" class="hover:text-blue-400">GMAIL</a>
+            <a href="https://docs.google.com" target="_blank" class="hover:text-blue-400">DOCS</a>
+            <a href="https://docs.google.com/spreadsheets" target="_blank" class="hover:text-blue-400">SHEETS</a>
+        </div>
+        <div class="flex gap-4">
+            <label class="cursor-pointer glass px-3 py-1 text-[10px] hover:bg-white/10">
+                CHANGE BG
+                <input type="file" id="bg-upload" class="hidden" accept="image/*">
+            </label>
+            <nav class="flex gap-2 glass px-2 py-1 text-[10px] font-bold">
+                <button onclick="showPage(0)" class="px-3 hover:text-[#39c5bb]">HOME</button>
+                <button onclick="showPage(1)" class="px-3 hover:text-[#39c5bb]">MUSIC</button>
             </nav>
         </div>
+    </div>
 
-        <div class="glass p-2 flex items-center mb-12 shadow-2xl focus-within:ring-1 focus-within:ring-[#39c5bb]">
-            <input type="text" id="search-input" autofocus placeholder="Search keywords..." 
-                   class="bg-transparent w-full px-6 py-4 outline-none text-xl placeholder-gray-700">
+    <main class="relative z-10 max-w-6xl mx-auto pt-32 px-6">
+        
+        <div class="glass p-2 flex items-center mb-16 shadow-2xl focus-within:ring-1 focus-within:ring-[#39c5bb] transition-all w-full max-w-2xl">
+            <select id="engine" class="bg-transparent text-xs ml-4 pr-4 outline-none border-r border-white/10 cursor-pointer text-slate-400 font-bold">
+                <option value="https://www.google.com/search?q=">GOOGLE</option>
+                <option value="https://yandex.com/search/?text=">YANDEX</option>
+                <option value="https://github.com/search?q=">GITHUB</option>
+                <option value="https://www.bing.com/search?q=">BING</option>
+            </select>
+            <input type="text" id="search-input" autofocus placeholder="Search your multiverse..." 
+                   class="bg-transparent w-full px-6 py-4 outline-none text-xl placeholder-slate-700">
         </div>
 
         <div id="page-0" class="page-content page-active">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="md:col-span-2 glass overflow-hidden group">
-                    <div class="h-64 overflow-hidden">
-                         <img src="https://images.unsplash.com/photo-1541462608141-ad6039785906?q=80&w=2070" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                    </div>
-                    <div class="p-6">
-                        <h3 class="font-bold text-xl mb-2">Featured Collection</h3>
-                        <p class="text-gray-500 text-sm">你的哲学与代码的交叉点。</p>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <a href="https://github.com" class="glass p-4 flex items-center gap-4 hover:bg-white/5 block">
-                        <img src="https://cdn.simpleicons.org/github/white" class="w-8 h-8"> <span>GitHub</span>
-                    </a>
-                    <a href="https://bilibili.com" class="glass p-4 flex items-center gap-4 hover:bg-white/5 block">
-                        <img src="https://cdn.simpleicons.org/bilibili/00AEEC" class="w-8 h-8"> <span>Bilibili</span>
-                    </a>
-                </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                <a href="https://www.reddit.com" class="glass p-4 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/reddit/FF4500" class="w-8 h-8 mb-2">
+                    <span class="text-[10px] font-bold opacity-60 group-hover:opacity-100">REDDIT</span>
+                </a>
+                <a href="https://youtube.com" class="glass p-4 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/youtube/FF0000" class="w-8 h-8 mb-2">
+                    <span class="text-[10px] font-bold opacity-60 group-hover:opacity-100">YOUTUBE</span>
+                </a>
+                <a href="https://twitter.com" class="glass p-4 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/x/white" class="w-8 h-8 mb-2">
+                    <span class="text-[10px] font-bold opacity-60 group-hover:opacity-100">TWITTER</span>
+                </a>
+                <a href="https://t.me" class="glass p-4 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/telegram/26A5E4" class="w-8 h-8 mb-2">
+                    <span class="text-[10px] font-bold opacity-60 group-hover:opacity-100">TELEGRAM</span>
+                </a>
+                <a href="https://discord.com" class="glass p-4 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/discord/5865F2" class="w-8 h-8 mb-2">
+                    <span class="text-[10px] font-bold opacity-60 group-hover:opacity-100">DISCORD</span>
+                </a>
+                <a href="https://open.spotify.com" class="glass p-4 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/spotify/1DB954" class="w-8 h-8 mb-2">
+                    <span class="text-[10px] font-bold opacity-60 group-hover:opacity-100">SPOTIFY</span>
+                </a>
+                <a href="https://linux.do" class="glass p-4 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/linux/white" class="w-8 h-8 mb-2">
+                    <span class="text-[10px] font-bold opacity-60 group-hover:opacity-100">LINUX.DO</span>
+                </a>
+                <a href="https://gemini.google.com" class="glass p-4 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/googlegemini/4285F4" class="w-8 h-8 mb-2">
+                    <span class="text-[10px] font-bold opacity-60 group-hover:opacity-100">GEMINI</span>
+                </a>
+                <a href="https://annas-archive.org" class="glass p-4 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/internetarchive/white" class="w-8 h-8 mb-2">
+                    <span class="text-[10px] font-bold opacity-60 group-hover:opacity-100">ANNA'S ARCHIVE</span>
+                </a>
+                <a href="https://zhihu.com" class="glass p-4 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/zhihu/0084FF" class="w-8 h-8 mb-2">
+                    <span class="text-[10px] font-bold opacity-60 group-hover:opacity-100">ZHIHU</span>
+                </a>
+                <a href="https://bgm.tv" class="glass p-4 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/anilist/F09199" class="w-8 h-8 mb-2">
+                    <span class="text-[10px] font-bold opacity-60 group-hover:opacity-100">BANGUMI</span>
+                </a>
+                <a href="https://rsshub.app" class="glass p-4 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/rss/FE7300" class="w-8 h-8 mb-2">
+                    <span class="text-[10px] font-bold opacity-60 group-hover:opacity-100">RSSHUB</span>
+                </a>
+                <a href="obsidian://open" class="glass p-4 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/obsidian/purple" class="w-8 h-8 mb-2">
+                    <span class="text-[10px] font-bold opacity-60 group-hover:opacity-100">OBSIDIAN</span>
+                </a>
             </div>
         </div>
 
         <div id="page-1" class="page-content">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="glass p-4 border-t-4 border-blue-500">
-                    <h4 class="font-bold text-sm mb-4 opacity-50 uppercase">Research (Philosophy)</h4>
-                    <div class="space-y-2">
-                        <div class="bg-white/5 p-3 rounded text-sm">黑格尔《精神现象学》导读笔记</div>
-                        <div class="bg-white/5 p-3 rounded text-sm">拉康镜像理论与现代 AI 幻觉分析</div>
+            <div class="glass p-10 flex flex-col items-center max-w-xl">
+                <div class="w-32 h-32 rounded-full border-4 border-[#39c5bb] overflow-hidden mb-6 animate-spin-slow">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=miku" class="w-full h-full">
+                </div>
+                <h3 class="text-xl font-black text-[#39c5bb] mb-4">VOCALOID_RELIQUARY</h3>
+                <div class="w-full space-y-3 mb-8">
+                    <div class="flex justify-between text-sm glass p-3 hover:bg-white/10 cursor-pointer">
+                        <span>ryo - 世界で一番おひめさま</span>
+                        <span class="opacity-40">04:12</span>
+                    </div>
+                    <div class="flex justify-between text-sm glass p-3 hover:bg-white/10 cursor-pointer">
+                        <span>DECO*27 - 乙女解剖</span>
+                        <span class="opacity-40">03:45</span>
                     </div>
                 </div>
-                <div class="glass p-4 border-t-4 border-green-500">
-                    <h4 class="font-bold text-sm mb-4 opacity-50 uppercase">Dev (CachyOS/Arch)</h4>
-                    <div class="space-y-2">
-                        <div class="bg-white/5 p-3 rounded text-sm">B580 渲染管线压力测试脚本</div>
-                        <div class="bg-white/5 p-3 rounded text-sm">Home Lab NAS 自动同步配置</div>
-                    </div>
-                </div>
-                <div class="glass p-4 border-t-4 border-purple-500">
-                    <h4 class="font-bold text-sm mb-4 opacity-50 uppercase">Archive</h4>
-                    <div class="bg-white/5 p-3 rounded text-sm">Obsidian 30GB 附件清理计划</div>
-                </div>
+                <button onclick="toggleMusic()" class="px-10 py-2 border border-[#39c5bb] text-[#39c5bb] font-bold hover:bg-[#39c5bb]/20">PLAY SYSTEM_AUDIO</button>
+                <audio id="bgm" loop src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
             </div>
         </div>
 
-        <div id="page-2" class="page-content">
-            <div class="glass p-8 flex flex-col items-center">
-                <div class="w-48 h-48 rounded-full border-8 miku-border overflow-hidden mb-6 animate-spin-slow">
-                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=miku" class="w-full h-full object-cover">
-                </div>
-                <h2 class="text-2xl font-black miku-blue mb-2">39.0 Player</h2>
-                <p class="text-gray-500 text-sm mb-8">正在播放: ryo (supercell) - 世界で一番おひめさま</p>
-                <div class="w-full space-y-2">
-                    <div class="flex justify-between items-center p-3 hover:bg-white/5 rounded cursor-pointer">
-                        <span>1. 告诉你的世界 (Tell Your World)</span>
-                        <span class="text-xs text-gray-600">04:15</span>
-                    </div>
-                    <div class="flex justify-between items-center p-3 hover:bg-white/5 rounded cursor-pointer">
-                        <span>2. 滚动女孩 (Rolling Girl)</span>
-                        <span class="text-xs text-gray-600">03:12</span>
-                    </div>
-                </div>
-                <audio id="bgm" loop>
-                    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-                </audio>
-                <button onclick="toggleMusic()" id="music-btn" class="mt-8 px-8 py-2 border miku-border miku-blue hover:bg-[#39c5bb]/20 transition-all font-bold">PLAY / PAUSE</button>
-            </div>
-        </div>
-
-    </div>
+    </main>
 
     <script>
-        // 翻页逻辑
-        const pages = document.querySelectorAll('.page-content');
+        // --- 1. 基础翻页逻辑 ---
         function showPage(index) {
-            pages.forEach((page, i) => {
-                page.classList.remove('page-active');
-                if(i === index) page.classList.add('page-active');
+            document.querySelectorAll('.page-content').forEach((p, i) => {
+                p.classList.toggle('page-active', i === index);
             });
         }
 
-        // 搜索逻辑
+        // --- 2. 搜索逻辑 ---
         const input = document.getElementById('search-input');
         input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                window.location.href = "https://www.google.com/search?q=" + encodeURIComponent(input.value);
+            if (e.key === 'Enter' && input.value.trim()) {
+                const engine = document.getElementById('engine').value;
+                window.location.href = engine + encodeURIComponent(input.value);
             }
         });
 
-        // 音乐播放逻辑
-        const bgm = document.getElementById('bgm');
-        function toggleMusic() {
-            if (bgm.paused) {
-                bgm.play();
-                document.getElementById('music-btn').innerText = "PAUSE";
-            } else {
-                bgm.pause();
-                document.getElementById('music-btn').innerText = "PLAY";
+        // --- 3. 自定义背景 ---
+        const bgUpload = document.getElementById('bg-upload');
+        bgUpload.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                document.getElementById('bg-container').style.backgroundImage = `url(${url})`;
+                localStorage.setItem('custom-bg', url); // 仅当前会话有效
             }
+        });
+
+        // --- 4. 音乐播放器 ---
+        function toggleMusic() {
+            const bgm = document.getElementById('bgm');
+            bgm.paused ? bgm.play() : bgm.pause();
         }
+
+        // --- 5. VRM 3D 渲染 (硬核部分) ---
+        const container = document.getElementById('vrm-container');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(30, container.clientWidth / container.clientHeight, 0.1, 100);
+        camera.position.set(0, 1.4, 3.5);
+
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        container.appendChild(renderer.domElement);
+
+        const light = new THREE.DirectionalLight(0xffffff, 1.0);
+        light.position.set(1, 1, 1).normalize();
+        scene.add(light);
+        scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+
+        let currentVrm = null;
+        const loader = new THREE.GLTFLoader();
+        // 💡 提示：你需要把一个 .vrm 文件上传到你的 GitHub 仓库
+        // 下面是一个测试用的 VRM 路径（可能因 CORS 无法加载，建议换成你自己的路径）
+        const vrmUrl = 'https://pixiv.github.io/three-vrm/packages/three-vrm/examples/models/three-vrm-girl.vrm';
+
+        loader.load(vrmUrl, (gltf) => {
+            THREE.VRMUtils.removeUnusedVertices(gltf.scene);
+            THREE.VRMUtils.combineConfigurations(gltf);
+            THREE.VRM.from(gltf).then((vrm) => {
+                scene.add(vrm.scene);
+                currentVrm = vrm;
+                vrm.scene.rotation.y = Math.PI; // 转向正面
+            });
+        }, 
+        (progress) => console.log('Loading VRM...', 100.0 * (progress.loaded / progress.total), '%'),
+        (error) => console.error(error));
+
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const deltaTime = clock.getDelta();
+            if (currentVrm) {
+                // 呼吸效果：让肩膀轻微起伏
+                currentVrm.humanoid.getNormalizedBoneNode('leftUpperArm').rotation.z = Math.sin(clock.elapsedTime) * 0.05;
+                currentVrm.humanoid.getNormalizedBoneNode('rightUpperArm').rotation.z = -Math.sin(clock.elapsedTime) * 0.05;
+                currentVrm.update(deltaTime);
+            }
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // 窗口缩放适配
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
     </script>
 </body>
 </html>
