@@ -1,6 +1,41 @@
-git init
-git add index.html
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/你的用户名/my-nav.git
-git push -u origin main
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Center - 药酱的导航</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0f172a; color: #f8fafc; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-6">
+    <div class="w-full max-w-xl mb-10">
+        <div class="glass p-2 rounded-2xl flex items-center shadow-xl">
+            <select id="engine" class="bg-transparent text-sm px-3 outline-none border-r border-slate-700 cursor-pointer">
+                <option value="https://www.google.com/search?q=">Google</option>
+                <option value="https://www.bing.com/search?q=">Bing</option>
+                <option value="https://github.com/search?q=">GitHub</option>
+            </select>
+            <input type="text" id="search-input" autofocus placeholder="键入并搜索..." class="bg-transparent w-full px-4 py-2 outline-none text-lg">
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-2xl">
+        <a href="https://github.com" class="glass p-4 rounded-xl hover:bg-slate-800 transition-all text-center">GitHub</a>
+        <a href="https://v2ex.com" class="glass p-4 rounded-xl hover:bg-slate-800 transition-all text-center">V2EX</a>
+        <a href="https://bilibili.com" class="glass p-4 rounded-xl hover:bg-slate-800 transition-all text-center">Bilibili</a>
+    </div>
+
+    <script>
+        const input = document.getElementById('search-input');
+        const engine = document.getElementById('engine');
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && input.value.trim()) {
+                window.location.href = engine.value + encodeURIComponent(input.value);
+            }
+        });
+    </script>
+</body>
+</html>
