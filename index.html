@@ -3,147 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steam Dashboard - 药酱</title>
+    <title>Multiverse - 药酱</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background: #1b2838; /* Steam 经典深蓝底色 */
-            background-image: 
-                linear-gradient(to bottom, rgba(27, 40, 56, 0.8), rgba(27, 40, 56, 0.95)),
-                url('https://images.unsplash.com/photo-1464802686167-b939a67e06a1?q=80&w=2070');
+            background: #0d0d12;
+            color: #e0e0e6;
+            font-family: "Segoe UI", Roboto, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* 顶部半透明头图 */
+        .hero-section {
+            background: linear-gradient(to bottom, rgba(13, 13, 18, 0.2), #0d0d12),
+                        url('https://images.unsplash.com/photo-1614728263952-84ea206f99b6?q=80&w=2070');
             background-size: cover;
             background-position: center;
-            background-attachment: fixed;
-            color: #c7d5ed;
-            font-family: "Motiva Sans", Arial, sans-serif;
+            height: 35vh;
+            mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
         }
 
-        /* Steam 蓝光效果 */
-        .steam-card {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(103, 193, 245, 0.1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
         }
 
-        .steam-card:hover {
-            border-color: rgba(103, 193, 245, 0.5);
-            box-shadow: 0 0 20px rgba(103, 193, 245, 0.2);
-        }
-
-        .showcase-img {
-            transition: transform 0.5s ease, filter 0.5s ease;
-            filter: brightness(0.8);
-        }
-
-        .showcase-img:hover {
-            transform: scale(1.02);
-            filter: brightness(1.1);
-        }
-
-        /* 下拉菜单动画 */
-        .dropdown-content {
-            display: none;
-            animation: fadeIn 0.2s ease-out;
-        }
-        .group:hover .dropdown-content { display: block; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
+        /* 分页切换动画 */
+        .page-content { display: none; animation: slideIn 0.4s ease-out; }
+        .page-active { display: block; }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* 术力口霓虹色 */
+        .miku-blue { color: #39c5bb; }
+        .miku-border { border-color: #39c5bb; }
     </style>
 </head>
-<body class="min-h-screen pb-20">
+<body class="min-h-screen">
 
-    <header class="w-full bg-[#171a21]/80 backdrop-blur-md px-10 py-3 flex justify-between items-center sticky top-0 z-50">
-        <div class="flex gap-6 text-sm font-bold tracking-widest text-[#dcdedf]">
-            <a href="#" class="hover:text-white">STORE</a>
-            <a href="#" class="hover:text-white">COMMUNITY</a>
-            <a href="https://github.com/tokyomoonlight" class="hover:text-white text-[#67c1f5]">YAOJIANG</a>
-        </div>
-        
-        <div class="flex items-center gap-4">
-            <div class="relative group">
-                <button class="flex items-center gap-1 hover:text-white text-sm">GOOGLE APPS <span class="text-[10px]">▼</span></button>
-                <div class="dropdown-content absolute right-0 mt-2 w-48 bg-[#3d4450] shadow-2xl rounded-sm p-1 border border-gray-600">
-                    <a href="https://mail.google.com" class="block px-4 py-2 hover:bg-[#67c1f5] hover:text-white text-xs">Gmail</a>
-                    <a href="https://docs.google.com" class="block px-4 py-2 hover:bg-[#67c1f5] hover:text-white text-xs">Google Docs</a>
-                    <a href="https://drive.google.com" class="block px-4 py-2 hover:bg-[#67c1f5] hover:text-white text-xs">Drive</a>
-                </div>
-            </div>
-            <div class="w-8 h-8 rounded-sm bg-gradient-to-br from-[#67c1f5] to-[#417b9b] p-[1px]">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" class="w-full h-full object-cover" alt="Avatar">
-            </div>
-        </div>
-    </header>
+    <div class="hero-section absolute top-0 w-full z-0"></div>
 
-    <main class="max-w-5xl mx-auto mt-12 px-4">
-        
-        <div class="mb-16">
-            <div class="steam-card p-2 rounded flex items-center focus-within:ring-1 focus-within:ring-[#67c1f5] transition-all">
-                <select id="engine" class="bg-[#2a475e] text-xs px-3 py-2 rounded-sm outline-none text-[#67c1f5] font-bold">
-                    <option value="https://www.google.com/search?q=">GOOGLE</option>
-                    <option value="https://github.com/search?q=">GITHUB</option>
-                    <option value="https://www.bing.com/search?q=">BING</option>
-                </select>
-                <input type="text" id="search-input" autofocus placeholder="Search your library..." 
-                       class="bg-transparent w-full px-5 py-3 outline-none text-xl placeholder-gray-600">
-            </div>
+    <div class="relative z-10 pt-20 px-6 max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-black tracking-tighter miku-blue italic">COMMAND_CENTER.v3</h1>
+            <nav class="flex gap-4 glass px-4 py-2 text-xs font-bold uppercase tracking-widest">
+                <button onclick="showPage(0)" class="hover:text-blue-400 transition-colors">HOME</button>
+                <button onclick="showPage(1)" class="hover:text-blue-400 transition-colors">KANBAN</button>
+                <button onclick="showPage(2)" class="hover:text-blue-400 transition-colors">VOCALOID</button>
+            </nav>
         </div>
 
-        <section class="steam-card rounded-sm mb-10">
-            <div class="bg-[#1b2838]/50 px-4 py-2 border-b border-white/5 flex justify-between">
-                <span class="text-xs tracking-widest text-white uppercase">Art Showcase</span>
-                <span class="text-[10px] text-[#67c1f5]">View All</span>
-            </div>
-            <div class="p-4 grid grid-cols-12 gap-2">
-                <div class="col-span-9 overflow-hidden rounded-sm border border-black shadow-inner bg-black">
-                    <img src="https://images.unsplash.com/photo-1578632738908-4521c726eebf?q=80&w=2070" 
-                         class="showcase-img w-full h-[400px] object-cover">
-                </div>
-                <div class="col-span-3 flex flex-col gap-2">
-                    <div class="flex-1 overflow-hidden rounded-sm border border-black bg-black">
-                         <img src="https://images.unsplash.com/photo-1541462608141-ad6039785906?q=80&w=2070" 
-                              class="showcase-img w-full h-full object-cover">
+        <div class="glass p-2 flex items-center mb-12 shadow-2xl focus-within:ring-1 focus-within:ring-[#39c5bb]">
+            <input type="text" id="search-input" autofocus placeholder="Search keywords..." 
+                   class="bg-transparent w-full px-6 py-4 outline-none text-xl placeholder-gray-700">
+        </div>
+
+        <div id="page-0" class="page-content page-active">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="md:col-span-2 glass overflow-hidden group">
+                    <div class="h-64 overflow-hidden">
+                         <img src="https://images.unsplash.com/photo-1541462608141-ad6039785906?q=80&w=2070" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
                     </div>
-                    <div class="flex-1 overflow-hidden rounded-sm border border-black bg-black">
-                         <img src="https://images.unsplash.com/photo-1614728263952-84ea206f99b6?q=80&w=2070" 
-                              class="showcase-img w-full h-full object-cover">
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl mb-2">Featured Collection</h3>
+                        <p class="text-gray-500 text-sm">你的哲学与代码的交叉点。</p>
                     </div>
                 </div>
+                <div class="space-y-4">
+                    <a href="https://github.com" class="glass p-4 flex items-center gap-4 hover:bg-white/5 block">
+                        <img src="https://cdn.simpleicons.org/github/white" class="w-8 h-8"> <span>GitHub</span>
+                    </a>
+                    <a href="https://bilibili.com" class="glass p-4 flex items-center gap-4 hover:bg-white/5 block">
+                        <img src="https://cdn.simpleicons.org/bilibili/00AEEC" class="w-8 h-8"> <span>Bilibili</span>
+                    </a>
+                </div>
             </div>
-        </section>
-
-        <div class="grid grid-cols-4 gap-4">
-            <a href="https://store.steampowered.com" class="steam-card p-4 rounded-sm flex flex-col items-center group">
-                <img src="https://cdn.simpleicons.org/steam/67c1f5" class="w-10 h-10 mb-2 opacity-80 group-hover:opacity-100">
-                <span class="text-[10px] uppercase font-bold text-gray-400 group-hover:text-[#67c1f5]">Steam</span>
-            </a>
-            <a href="https://bilibili.com" class="steam-card p-4 rounded-sm flex flex-col items-center group">
-                <img src="https://cdn.simpleicons.org/bilibili/00AEEC" class="w-10 h-10 mb-2 opacity-80 group-hover:opacity-100">
-                <span class="text-[10px] uppercase font-bold text-gray-400 group-hover:text-[#67c1f5]">Bilibili</span>
-            </a>
-            <a href="https://gemini.google.com" class="steam-card p-4 rounded-sm flex flex-col items-center group">
-                <img src="https://cdn.simpleicons.org/googlegemini/4285F4" class="w-10 h-10 mb-2 opacity-80 group-hover:opacity-100">
-                <span class="text-[10px] uppercase font-bold text-gray-400 group-hover:text-[#67c1f5]">Gemini</span>
-            </a>
-            <a href="https://youtube.com" class="steam-card p-4 rounded-sm flex flex-col items-center group">
-                <img src="https://cdn.simpleicons.org/youtube/FF0000" class="w-10 h-10 mb-2 opacity-80 group-hover:opacity-100">
-                <span class="text-[10px] uppercase font-bold text-gray-400 group-hover:text-[#67c1f5]">YouTube</span>
-            </a>
         </div>
 
-    </main>
+        <div id="page-1" class="page-content">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass p-4 border-t-4 border-blue-500">
+                    <h4 class="font-bold text-sm mb-4 opacity-50 uppercase">Research (Philosophy)</h4>
+                    <div class="space-y-2">
+                        <div class="bg-white/5 p-3 rounded text-sm">黑格尔《精神现象学》导读笔记</div>
+                        <div class="bg-white/5 p-3 rounded text-sm">拉康镜像理论与现代 AI 幻觉分析</div>
+                    </div>
+                </div>
+                <div class="glass p-4 border-t-4 border-green-500">
+                    <h4 class="font-bold text-sm mb-4 opacity-50 uppercase">Dev (CachyOS/Arch)</h4>
+                    <div class="space-y-2">
+                        <div class="bg-white/5 p-3 rounded text-sm">B580 渲染管线压力测试脚本</div>
+                        <div class="bg-white/5 p-3 rounded text-sm">Home Lab NAS 自动同步配置</div>
+                    </div>
+                </div>
+                <div class="glass p-4 border-t-4 border-purple-500">
+                    <h4 class="font-bold text-sm mb-4 opacity-50 uppercase">Archive</h4>
+                    <div class="bg-white/5 p-3 rounded text-sm">Obsidian 30GB 附件清理计划</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="page-2" class="page-content">
+            <div class="glass p-8 flex flex-col items-center">
+                <div class="w-48 h-48 rounded-full border-8 miku-border overflow-hidden mb-6 animate-spin-slow">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=miku" class="w-full h-full object-cover">
+                </div>
+                <h2 class="text-2xl font-black miku-blue mb-2">39.0 Player</h2>
+                <p class="text-gray-500 text-sm mb-8">正在播放: ryo (supercell) - 世界で一番おひめさま</p>
+                <div class="w-full space-y-2">
+                    <div class="flex justify-between items-center p-3 hover:bg-white/5 rounded cursor-pointer">
+                        <span>1. 告诉你的世界 (Tell Your World)</span>
+                        <span class="text-xs text-gray-600">04:15</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 hover:bg-white/5 rounded cursor-pointer">
+                        <span>2. 滚动女孩 (Rolling Girl)</span>
+                        <span class="text-xs text-gray-600">03:12</span>
+                    </div>
+                </div>
+                <audio id="bgm" loop>
+                    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+                </audio>
+                <button onclick="toggleMusic()" id="music-btn" class="mt-8 px-8 py-2 border miku-border miku-blue hover:bg-[#39c5bb]/20 transition-all font-bold">PLAY / PAUSE</button>
+            </div>
+        </div>
+
+    </div>
 
     <script>
-        const input = document.getElementById('search-input');
-        const engineSelect = document.getElementById('engine');
+        // 翻页逻辑
+        const pages = document.querySelectorAll('.page-content');
+        function showPage(index) {
+            pages.forEach((page, i) => {
+                page.classList.remove('page-active');
+                if(i === index) page.classList.add('page-active');
+            });
+        }
 
+        // 搜索逻辑
+        const input = document.getElementById('search-input');
         input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && input.value.trim()) {
-                window.location.href = engineSelect.value + encodeURIComponent(input.value);
+            if (e.key === 'Enter') {
+                window.location.href = "https://www.google.com/search?q=" + encodeURIComponent(input.value);
             }
         });
+
+        // 音乐播放逻辑
+        const bgm = document.getElementById('bgm');
+        function toggleMusic() {
+            if (bgm.paused) {
+                bgm.play();
+                document.getElementById('music-btn').innerText = "PAUSE";
+            } else {
+                bgm.pause();
+                document.getElementById('music-btn').innerText = "PLAY";
+            }
+        }
     </script>
 </body>
 </html>
