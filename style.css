@@ -1,0 +1,35 @@
+/* style.css */
+
+/* 这里是主要的星空背景设置 */
+body {
+    background: 
+        linear-gradient(to bottom, rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.7)), /* 加上半透明的遮罩层 */
+        url('https://images.unsplash.com/photo-1475274047050-1d0c0975c63e?auto=format&fit=crop&q=80&w=2070'); /* 这是一张类似 Google 风格的高清星空 */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    color: #f8fafc;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    overflow: hidden; /* 防止出现滚动条 */
+}
+
+/* 磨砂玻璃效果的通用样式 (`glass`) */
+.glass {
+    background: rgba(15, 23, 42, 0.3); /* 深色背景透明度 */
+    backdrop-filter: blur(14px) saturate(180%); /* 核心模糊效果 */
+    -webkit-backdrop-filter: blur(14px) saturate(180%); /* 兼容 Safari */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* 轻微的边缘光感 */
+}
+
+/* 顶部图标卡片的悬停动画细节 */
+.icon-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.icon-btn:hover { 
+    transform: translateY(-8px) scale(1.1); /* 向上轻轻弹起并放大 */
+    filter: drop-shadow(0 0 15px rgba(255,255,255,0.2)); /* 加上发光阴影 */
+}
+
+/* 搜索框在聚焦时的光效 */
+#search-container:focus-within {
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
+    border-color: rgba(59, 130, 246, 0.5);
+}
