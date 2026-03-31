@@ -4,73 +4,99 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Command Center - 药酱</title>
-    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 这里是一些只能在这里写的内联样式，比如图标颜色 */
-        .simple-icon-google { color: #f8fafc; }
-        .simple-icon-github { color: #f8fafc; }
+        body {
+            /* 使用你截图里那种紫粉色星空背景 */
+            background: 
+                linear-gradient(to bottom, rgba(46, 16, 101, 0.2), rgba(15, 23, 42, 0.6)),
+                url('https://images.unsplash.com/photo-1464802686167-b939a67e06a1?auto=format&fit=crop&q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .icon-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .icon-btn:hover { transform: translateY(-5px); filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); }
+        
+        /* 隐藏滚动条但保留滚动功能 */
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen">
+<body class="min-h-screen flex flex-col">
 
-    <div class="flex flex-wrap justify-center gap-6 mb-16 px-8 py-5 glass rounded-[2rem] shadow-2xl">
-        <a href="https://gemini.google.com" target="_blank" class="icon-btn p-2 rounded-xl">
-            <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/googlegemini.svg" class="w-8 h-8" style="filter: drop-shadow(0 0 5px #4285F4);" title="Gemini">
-        </a>
-        <a href="https://www.bilibili.com" target="_blank" class="icon-btn p-2 rounded-xl">
-            <img src="https://cdn.simpleicons.org/bilibili/00AEEC" class="w-8 h-8" title="Bilibili">
-        </a>
-        <a href="https://t.me" target="_blank" class="icon-btn p-2 rounded-xl">
-            <img src="https://cdn.simpleicons.org/telegram/26A5E4" class="w-8 h-8" title="Telegram">
-        </a>
-        <a href="https://github.com" target="_blank" class="icon-btn p-2 rounded-xl">
-            <img src="https://cdn.simpleicons.org/github/white" class="w-8 h-8" title="GitHub">
-        </a>
-        <a href="https://x.com" target="_blank" class="icon-btn p-2 rounded-xl">
-            <img src="https://cdn.simpleicons.org/x/white" class="w-8 h-8" title="X">
-        </a>
-        <a href="https://www.reddit.com" target="_blank" class="icon-btn p-2 rounded-xl">
-            <img src="https://cdn.simpleicons.org/reddit/FF4500" class="w-8 h-8" title="Reddit">
-        </a>
-        <a href="https://www.zhihu.com" target="_blank" class="icon-btn p-2 rounded-xl">
-            <img src="https://cdn.simpleicons.org/zhihu/0084FF" class="w-8 h-8" title="知乎">
-        </a>
-        <a href="https://www.acfun.cn" target="_blank" class="icon-btn p-2 rounded-xl">
-            <img src="https://cdn.simpleicons.org/anilist/3DB5F3" class="w-8 h-8" style="filter: hue-rotate(150deg);" title="ACFun">
-        </a>
-        <a href="https://www.youtube.com" target="_blank" class="icon-btn p-2 rounded-xl">
-            <img src="https://cdn.simpleicons.org/youtube/FF0000" class="w-8 h-8" title="YouTube">
-        </a>
-    </div>
+    <div class="absolute top-6 right-8 flex items-center gap-5 text-sm font-light">
+        <a href="https://mail.google.com" target="_blank" class="hover:underline opacity-80">Gmail</a>
+        <a href="https://docs.google.com" target="_blank" class="hover:underline opacity-80">Docs</a>
+        
+        <button class="p-2 hover:bg-white/10 rounded-full transition-colors group">
+            <svg class="w-6 h-6 fill-current opacity-80 group-hover:opacity-100" viewBox="0 0 24 24">
+                <path d="M6 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM6 14c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM6 20c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6 0c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>
+            </svg>
+        </button>
 
-    <div class="w-full max-w-2xl" id="search-container">
-        <div class="glass p-2 rounded-2xl flex items-center shadow-2xl focus-within:ring-2 focus-within:ring-blue-500 transition-all">
-            <select id="engine" class="bg-transparent text-sm ml-4 pr-4 outline-none border-r border-slate-700 cursor-pointer text-slate-300">
-                <option value="https://www.google.com/search?q=">Google</option>
-                <option value="https://www.bing.com/search?q=">Bing</option>
-                <option value="https://github.com/search?q=">GitHub</option>
-            </select>
-            <input type="text" id="search-input" autofocus 
-                   placeholder="探索星辰大海..." 
-                   class="bg-transparent w-full px-6 py-4 outline-none text-xl placeholder-slate-500">
-        </div>
-        <div class="mt-4 flex justify-center gap-8 text-[11px] text-slate-500 tracking-[0.2em] uppercase">
-            <span>Alt + 1/2/3 Switch</span>
-            <span>/ Focus Search</span>
+        <div class="relative group">
+            <div class="w-9 h-9 rounded-full border-2 border-white/20 overflow-hidden cursor-pointer hover:border-white/50 transition-all">
+                <img id="user-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Avatar" class="w-full h-full object-cover">
+            </div>
+            <div class="absolute top-12 right-0 w-40 glass rounded-xl p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none group-hover:pointer-events-auto">
+                <p class="text-xs text-center">药酱的终端</p>
+                <div class="h-[1px] bg-white/10 my-2"></div>
+                <a href="https://github.com/tokyomoonlight" class="text-[10px] block hover:text-blue-300">管理我的 GitHub</a>
+            </div>
         </div>
     </div>
 
-    <div class="absolute top-6 right-6 flex items-center gap-4 text-slate-400 glass px-5 py-3 rounded-full">
-        <a href="https://www.google.com" target="_blank" class="group transition-all">
-            <img src="https://cdn.simpleicons.org/google/white" class="w-7 h-7 group-hover:filter group-hover:drop-shadow(0 0 8px rgba(255,255,255,0.4))" title="Google Services">
-        </a>
-        <div class="relative group cursor-pointer">
-            <img src="https://secure.gravatar.com/avatar/64e1b8c80521e649079a0e666014457e?s=128&d=mm&r=g" class="w-10 h-10 rounded-full border-2 border-slate-600 transition-all hover:border-blue-500" title="User Management">
-            <div class="absolute top-12 right-0 w-48 bg-slate-800 rounded-lg p-3 shadow-xl opacity-0 group-hover:opacity-100 transition-opacity">
-                <p class="text-xs text-slate-300">药酱's CommandCenter</p>
-                <p class="text-[10px] text-slate-500">mynavi.github.io</p>
-            }
+    <div class="flex-1 flex flex-col items-center justify-center p-6">
+        
+        <div class="flex flex-wrap justify-center gap-6 mb-16 px-8 py-5 glass rounded-[2rem] shadow-2xl">
+            <a href="https://mail.google.com" target="_blank" class="icon-btn p-2">
+                <img src="https://cdn.simpleicons.org/gmail/EA4335" class="w-8 h-8" title="Gmail">
+            </a>
+            <a href="https://docs.google.com" target="_blank" class="icon-btn p-2">
+                <img src="https://cdn.simpleicons.org/googledocs/4285F4" class="w-8 h-8" title="Google Docs">
+            </a>
+            <a href="https://gemini.google.com" target="_blank" class="icon-btn p-2">
+                <img src="https://cdn.simpleicons.org/googlegemini/4285F4" class="w-8 h-8" title="Gemini">
+            </a>
+            <a href="https://www.bilibili.com" target="_blank" class="icon-btn p-2">
+                <img src="https://cdn.simpleicons.org/bilibili/00AEEC" class="w-8 h-8" title="Bilibili">
+            </a>
+            <a href="https://t.me" target="_blank" class="icon-btn p-2">
+                <img src="https://cdn.simpleicons.org/telegram/26A5E4" class="w-8 h-8" title="Telegram">
+            </a>
+            <a href="https://github.com" target="_blank" class="icon-btn p-2">
+                <img src="https://cdn.simpleicons.org/github/white" class="w-8 h-8" title="GitHub">
+            </a>
+            <a href="https://www.youtube.com" target="_blank" class="icon-btn p-2">
+                <img src="https://cdn.simpleicons.org/youtube/FF0000" class="w-8 h-8" title="YouTube">
+            </a>
+        </div>
+
+        <div class="w-full max-w-2xl">
+            <div class="glass p-2 rounded-2xl flex items-center shadow-2xl focus-within:ring-2 focus-within:ring-purple-400/50 transition-all">
+                <select id="engine" class="bg-transparent text-sm ml-4 pr-4 outline-none border-r border-white/10 cursor-pointer text-slate-300">
+                    <option value="https://www.google.com/search?q=">Google</option>
+                    <option value="https://www.bing.com/search?q=">Bing</option>
+                    <option value="https://github.com/search?q=">GitHub</option>
+                </select>
+                <input type="text" id="search-input" autofocus 
+                       placeholder="探索紫色星海..." 
+                       class="bg-transparent w-full px-6 py-4 outline-none text-xl placeholder-white/20">
+            </div>
+            <div class="mt-6 flex justify-center gap-8 text-[11px] text-white/30 tracking-[0.3em] uppercase">
+                <span>Alt + 1/2/3 Switch</span>
+                <span>/ Focus Search</span>
+            </div>
         </div>
     </div>
 
@@ -78,13 +104,15 @@
         const input = document.getElementById('search-input');
         const engineSelect = document.getElementById('engine');
 
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                const query = input.value.trim();
-                if (query) {
-                    window.location.href = engineSelect.value + encodeURIComponent(query);
-                }
+        function doSearch() {
+            const query = input.value.trim();
+            if (query) {
+                window.location.href = engineSelect.value + encodeURIComponent(query);
             }
+        }
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') doSearch();
         });
 
         window.addEventListener('keydown', (e) => {
