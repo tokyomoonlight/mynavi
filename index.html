@@ -243,6 +243,50 @@
             camera.updateProjectionMatrix();
             renderer.setSize(container.clientWidth, container.clientHeight);
         });
+        // --- 3. 自定义背景 (修复版：支持持久化) ---
+const bgContainer = document.getElementById('bg-container');
+const bgUpload = document.getElementById('bg-upload');
+
+// 页面加载时检查是否有保存的背景
+const savedBg = localStorage.getItem('custom-bg');
+if (savedBg) {
+    bgContainer.style.backgroundImage = `url(${savedBg})`;
+}
+
+bgUpload.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const base64 = event.target.result;
+            bgContainer.style.backgroundImage = `url(${base64})`;
+            localStorage.setItem('custom-bg', base64); // 永久保存到本地
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// --- 5. VRM 3D 渲染 (路径修正) ---
+const vrmContainer = document.getElementById('vrm-container');
+// ... 之前的 Three.js 初始化代码保持不变 ...
+
+// 💡 修改这里：建议直接引用你 GitHub 里的相对路径
+const vrmUrl = './mascot.vrm'; 
+
+loader.load(vrmUrl, (gltf) => {
+    THREE.VRMUtils.removeUnusedVertices(gltf.scene);
+    THREE.VRMUtils.combineConfigurations(gltf);
+    THREE.VRM.from(gltf).then((vrm) => {
+        scene.add(vrm.scene);
+        currentVrm = vrm;
+        vrm.scene.rotation.y = Math.PI; // 转向正面
+        console.log("VRM Loaded Successfully!");
+    });
+}, 
+(progress) => {}, 
+(error) => {
+    console.error("VRM 加载失败，请检查文件路径或 CORS 限制:", error);
+});
     </script>
 </body>
 </html>
