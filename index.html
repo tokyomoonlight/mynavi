@@ -11,6 +11,34 @@
     <style>
         :root { --miku-blue: #39c5bb; }
         body { background: #0a0a0f; color: #e2e8f0; font-family: "Segoe UI", sans-serif; overflow: hidden; }
+
+<style>
+    :root { --miku-blue: #39c5bb; }
+    body { 
+        background: #ffffff; /* 彻底变白 */
+        color: #1e293b; /* 文字改为深色 */
+        font-family: "Segoe UI", sans-serif; 
+        overflow-x: hidden; 
+    }
+    
+    /* 浅色版的磨砂玻璃 */
+    .glass { 
+        background: rgba(255, 255, 255, 0.7); 
+        backdrop-filter: blur(20px); 
+        border: 1px solid rgba(0, 0, 0, 0.05); 
+    }
+
+    /* 导航卡片改为浅色悬停效果 */
+    .nav-card { transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.05); }
+    .nav-card:hover { 
+        transform: translateY(-5px); 
+        background: white; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        border-color: var(--miku-blue); 
+    }
+
+    #vrm-container { position: fixed; bottom: 0; right: 0; width: 50vw; height: 80vh; z-index: 5; pointer-events: none; }
+</style>
         
         /* 动态背景 */
         #bg-container {
@@ -66,14 +94,16 @@
         
         <div class="glass p-2 flex items-center mb-16 shadow-2xl focus-within:ring-1 focus-within:ring-[#39c5bb] transition-all w-full max-w-2xl">
             <select id="engine" class="bg-transparent text-xs ml-4 pr-4 outline-none border-r border-white/10 cursor-pointer text-slate-400 font-bold">
+                <option value="https://www.bing.com/search?q=">BING</option>
                 <option value="https://www.google.com/search?q=">GOOGLE</option>
                 <option value="https://yandex.com/search/?text=">YANDEX</option>
                 <option value="https://github.com/search?q=">GITHUB</option>
-                <option value="https://www.bing.com/search?q=">BING</option>
             </select>
-            <input type="text" id="search-input" autofocus placeholder="Search your multiverse..." 
-                   class="bg-transparent w-full px-6 py-4 outline-none text-xl placeholder-slate-700">
-        </div>
+
+        <input type="text" id="search-input" autofocus 
+               placeholder="search your multiverse..." 
+               class="bg-transparent w-full px-6 py-4 outline-none text-xl text-slate-800 placeholder-slate-300">
+    </div>
 
         <div id="page-0" class="page-content page-active">
             <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -129,6 +159,14 @@
                     <img src="https://cdn.simpleicons.org/obsidian/purple" class="w-8 h-8 mb-2">
                     <span class="text-[10px] font-bold opacity-60 group-hover:opacity-100">OBSIDIAN</span>
                 </a>
+                <a href="https://www.bilibili.com" class="glass p-4 flex flex-col items-center nav-card group text-slate-700">
+    <img src="https://cdn.simpleicons.org/bilibili/00AEEC" class="w-8 h-8 mb-2">
+    <span class="text-[10px] font-bold">BILIBILI</span>
+</a>
+<a href="https://grok.com" class="glass p-4 flex flex-col items-center nav-card group text-slate-700">
+    <img src="https://cdn.simpleicons.org/x/000000" class="w-8 h-8 mb-2">
+    <span class="text-[10px] font-bold">GROK</span>
+</a>
             </div>
         </div>
 
