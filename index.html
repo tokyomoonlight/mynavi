@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Command Center - 药酱</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/three@0.154.0/build/three.min.js"></script>
-    <script src="https://unpkg.com/three@0.154.0/examples/jsm/loaders/GLTFLoader.js"></script>
-    <script src="https://unpkg.com/@pixiv/three-vrm@2.0.0/lib/three-vrm.js"></script>
     <style>
         :root { --miku-blue: #39c5bb; }
         
@@ -44,12 +41,6 @@
             border-color: var(--miku-blue); 
         }
 
-        /* VRM 3D 容器 */
-        #vrm-container { 
-            position: fixed; bottom: 0; right: 0; width: 45vw; height: 80vh; 
-            z-index: 5; pointer-events: none; 
-        }
-
         .page-content { display: none; animation: fadeIn 0.5s ease; }
         .page-active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -60,7 +51,6 @@
 <body class="min-h-screen">
 
     <div id="bg-container"></div>
-    <div id="vrm-container"></div>
 
     <div class="fixed top-0 w-full z-50 flex justify-between items-center px-10 py-6">
         <div class="flex gap-6 text-[10px] font-black tracking-[0.2em] text-slate-400">
@@ -71,10 +61,6 @@
             <label class="cursor-pointer glass px-4 py-2 text-[10px] font-bold text-slate-500 hover:bg-slate-50 transition-colors">
                 CHANGE BG
                 <input type="file" id="bg-upload" class="hidden" accept="image/*">
-            </label>
-            <label class="cursor-pointer glass px-4 py-2 text-[10px] font-bold text-slate-500 hover:bg-slate-50 transition-colors">
-                LOAD VRM
-                <input type="file" id="vrm-upload" class="hidden" accept=".vrm">
             </label>
             
             <nav class="flex gap-1 glass p-1 ml-4">
@@ -106,25 +92,47 @@
                     <img src="https://cdn.simpleicons.org/bilibili/00AEEC" class="w-8 h-8 mb-3">
                     <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">BILIBILI</span>
                 </a>
-                
                 <a href="https://grok.com" class="glass p-5 flex flex-col items-center nav-card group">
-                    <img src="https://api.iconify.design/lucide:brain.svg?color=%23000000" class="w-8 h-8 mb-3">
+                    <img src="https://api.iconify.design/lucide:bot.svg?color=%23000000" class="w-8 h-8 mb-3">
                     <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">GROK</span>
                 </a>
-                
                 <a href="https://twitter.com" class="glass p-5 flex flex-col items-center nav-card group">
                     <img src="https://cdn.simpleicons.org/x/000000" class="w-8 h-8 mb-3">
                     <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">TWITTER</span>
                 </a>
-
                 <a href="https://open.spotify.com" class="glass p-5 flex flex-col items-center nav-card group">
                     <img src="https://cdn.simpleicons.org/spotify/1DB954" class="w-8 h-8 mb-3">
                     <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">SPOTIFY</span>
                 </a>
-
                 <a href="https://youtube.com" class="glass p-5 flex flex-col items-center nav-card group">
                     <img src="https://cdn.simpleicons.org/youtube/FF0000" class="w-8 h-8 mb-3">
                     <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">YOUTUBE</span>
+                </a>
+                
+                <a href="https://www.reddit.com" class="glass p-5 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/reddit/FF4500" class="w-8 h-8 mb-3">
+                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">REDDIT</span>
+                </a>
+                <a href="https://zhihu.com" class="glass p-5 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/zhihu/0084FF" class="w-8 h-8 mb-3">
+                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">ZHIHU</span>
+                </a>
+                <a href="https://github.com" class="glass p-5 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/github/000000" class="w-8 h-8 mb-3">
+                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">GITHUB</span>
+                </a>
+                <a href="https://quora.com" class="glass p-5 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/quora/B92B27" class="w-8 h-8 mb-3">
+                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">QUORA</span>
+                </a>
+                <a href="https://annas-archive.org" class="glass p-5 flex flex-col items-center nav-card group">
+                    <img src="https://api.iconify.design/lucide:book-open.svg?color=%23000000" class="w-8 h-8 mb-3">
+                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">ANNA'S ARCHIVE</span>
+                </a>
+
+                <a href="https://linux.do" class="glass p-5 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/linux/black" class="w-8 h-8 mb-3">
+                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">LINUX.DO</span>
                 </a>
                 <a href="https://t.me" class="glass p-5 flex flex-col items-center nav-card group">
                     <img src="https://cdn.simpleicons.org/telegram/26A5E4" class="w-8 h-8 mb-3">
@@ -133,10 +141,6 @@
                 <a href="https://discord.com" class="glass p-5 flex flex-col items-center nav-card group">
                     <img src="https://cdn.simpleicons.org/discord/5865F2" class="w-8 h-8 mb-3">
                     <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">DISCORD</span>
-                </a>
-                <a href="https://linux.do" class="glass p-5 flex flex-col items-center nav-card group">
-                    <img src="https://cdn.simpleicons.org/linux/black" class="w-8 h-8 mb-3">
-                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">LINUX.DO</span>
                 </a>
                 <a href="https://gemini.google.com" class="glass p-5 flex flex-col items-center nav-card group">
                     <img src="https://cdn.simpleicons.org/googlegemini/4285F4" class="w-8 h-8 mb-3">
@@ -150,7 +154,7 @@
         </div>
 
         <div id="page-1" class="page-content">
-            <div class="glass p-10 flex flex-col items-center max-w-xl mx-auto">
+            <div class="glass p-10 flex flex-col items-center max-w-xl mx-auto mt-10">
                 <div class="w-32 h-32 rounded-full border-4 border-[#39c5bb] overflow-hidden mb-6 animate-spin-slow shadow-inner">
                     <img src="https://api.dicebear.com/7.x/bottts/svg?seed=shiki" class="w-full h-full">
                 </div>
@@ -158,19 +162,16 @@
                 
                 <div class="w-full space-y-2 mb-8">
                     <div class="flex justify-between text-xs font-bold glass p-4 border border-[#39c5bb]/30">
-                        <span id="track-name">shiki - lapis</span>
+                        <span id="track-name">song1</span>
                         <span class="text-[#39c5bb]">♪</span>
                     </div>
                 </div>
 
                 <div class="flex gap-4">
-                    <label class="cursor-pointer px-6 py-3 glass text-slate-500 font-black text-xs tracking-widest hover:bg-slate-50 transition-all">
-                        UPLOAD MUSIC
-                        <input type="file" id="music-upload" class="hidden" accept="audio/*">
-                    </label>
-                    <button onclick="toggleMusic()" class="px-8 py-3 glass text-[#39c5bb] font-black text-xs tracking-widest hover:bg-slate-50 transition-all">PLAY / PAUSE</button>
+                    <button onclick="toggleMusic()" class="px-12 py-3 glass text-[#39c5bb] font-black text-xs tracking-widest hover:bg-slate-50 transition-all">PLAY / PAUSE</button>
                 </div>
-                <audio id="bgm" loop src="./lapis.mp3"></audio>
+                
+                <audio id="bgm" loop src="./song1.mp3"></audio>
             </div>
         </div>
     </main>
@@ -210,89 +211,15 @@
             }
         });
 
-        // --- 4. 音乐上传与播放 ---
+        // --- 4. 音乐播放控制 ---
         const bgm = document.getElementById('bgm');
         function toggleMusic() {
-            bgm.paused ? bgm.play() : bgm.pause();
-        }
-
-        document.getElementById('music-upload').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const url = URL.createObjectURL(file);
-                bgm.src = url;
-                bgm.play();
-                document.getElementById('track-name').innerText = file.name.replace(/\.[^/.]+$/, ""); // 去掉后缀名
+            if (bgm.paused) {
+                bgm.play().catch(err => console.log("播放失败，请确认同目录下是否存在 song1.mp3", err));
+            } else {
+                bgm.pause();
             }
-        });
-
-        // --- 5. VRM 3D 模型动态加载 (修复本地加载无反应问题) ---
-        const container = document.getElementById('vrm-container');
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(30, container.clientWidth / container.clientHeight, 0.1, 100);
-        camera.position.set(0, 1.4, 3.5);
-
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        container.appendChild(renderer.domElement);
-
-        scene.add(new THREE.DirectionalLight(0xffffff, 1.0));
-        scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-
-        let currentVrm = null;
-        const loader = new THREE.GLTFLoader();
-
-        // 核心：封装加载逻辑，支持动态 URL
-        function loadVRM(url) {
-            loader.load(url, (gltf) => {
-                // 如果场景里已经有模型，先清理掉
-                if (currentVrm) {
-                    scene.remove(currentVrm.scene);
-                    THREE.VRMUtils.deepDispose(currentVrm.scene);
-                }
-                
-                THREE.VRMUtils.removeUnusedVertices(gltf.scene);
-                THREE.VRM.from(gltf).then((vrm) => {
-                    scene.add(vrm.scene);
-                    currentVrm = vrm;
-                    vrm.scene.rotation.y = Math.PI; // 调整面向
-                });
-            }, undefined, (err) => console.log("VRM加载错误:", err));
         }
-
-        // 默认尝试加载同目录下的模型，如果跨域失败则静默
-        loadVRM('./mascot.vrm');
-
-        // 监听上传按钮，生成本地 URL 给加载器
-        document.getElementById('vrm-upload').addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const url = URL.createObjectURL(file);
-                loadVRM(url);
-            }
-        });
-
-        // 动画循环
-        const clock = new THREE.Clock();
-        function animate() {
-            requestAnimationFrame(animate);
-            if (currentVrm) {
-                const t = clock.getElapsedTime();
-                // 简单的呼吸/摆臂动画测试
-                currentVrm.humanoid.getNormalizedBoneNode('leftUpperArm').rotation.z = Math.sin(t) * 0.05 + 1.2;
-                currentVrm.humanoid.getNormalizedBoneNode('rightUpperArm').rotation.z = -Math.sin(t) * 0.05 - 1.2;
-                currentVrm.update(clock.getDelta());
-            }
-            renderer.render(scene, camera);
-        }
-        animate();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = container.clientWidth / container.clientHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
-        });
     </script>
 </body>
 </html>
