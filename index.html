@@ -10,154 +10,289 @@
     <script src="https://unpkg.com/@pixiv/three-vrm@2.0.0/lib/three-vrm.js"></script>
     <style>
         :root { --miku-blue: #39c5bb; }
-        body { background: #ffffff; color: #1e293b; font-family: "Segoe UI", sans-serif; overflow: hidden; }
-        #bg-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background-size: cover; background-position: center; }
-        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(0, 0, 0, 0.05); border-radius: 1rem; }
-        .nav-card { transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.03); }
-        .nav-card:hover { transform: translateY(-5px); background: #ffffff; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border-color: var(--miku-blue); }
-        #vrm-container { position: fixed; bottom: 0; right: 0; width: 45vw; height: 85vh; z-index: 5; pointer-events: none; }
+        
+        body { 
+            background: #ffffff; 
+            color: #1e293b; 
+            font-family: "Segoe UI", system-ui, sans-serif; 
+            overflow: hidden; 
+        }
+
+        /* 动态背景容器 */
+        #bg-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
+            background-size: cover; background-position: center; transition: background 0.5s ease;
+        }
+
+        /* 浅色磨砂玻璃效果 */
+        .glass { 
+            background: rgba(255, 255, 255, 0.7); 
+            backdrop-filter: blur(20px); 
+            border: 1px solid rgba(0, 0, 0, 0.05); 
+            border-radius: 1rem;
+        }
+
+        /* 导航卡片 */
+        .nav-card { 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            border: 1px solid rgba(0, 0, 0, 0.03); 
+        }
+        .nav-card:hover { 
+            transform: translateY(-5px); 
+            background: #ffffff; 
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border-color: var(--miku-blue); 
+        }
+
+        /* VRM 3D 容器 */
+        #vrm-container { 
+            position: fixed; bottom: 0; right: 0; width: 45vw; height: 80vh; 
+            z-index: 5; pointer-events: none; 
+        }
+
         .page-content { display: none; animation: fadeIn 0.5s ease; }
         .page-active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body>
+<body class="min-h-screen">
 
     <div id="bg-container"></div>
     <div id="vrm-container"></div>
 
     <div class="fixed top-0 w-full z-50 flex justify-between items-center px-10 py-6">
-        <div class="flex gap-6 text-[10px] font-black text-slate-400">
+        <div class="flex gap-6 text-[10px] font-black tracking-[0.2em] text-slate-400">
             <a href="https://mail.google.com" target="_blank" class="hover:text-blue-500">GMAIL</a>
             <a href="https://docs.google.com" target="_blank" class="hover:text-blue-500">DOCS</a>
-            <a href="https://docs.google.com/spreadsheets" target="_blank" class="hover:text-blue-500">SHEETS</a>
         </div>
-        <div class="flex gap-4">
-            <label class="cursor-pointer glass px-4 py-2 text-[10px] font-bold text-slate-500 hover:bg-slate-50">
-                CHANGE BG <input type="file" id="bg-upload" class="hidden" accept="image/*">
+        <div class="flex gap-4 items-center">
+            <label class="cursor-pointer glass px-4 py-2 text-[10px] font-bold text-slate-500 hover:bg-slate-50 transition-colors">
+                CHANGE BG
+                <input type="file" id="bg-upload" class="hidden" accept="image/*">
             </label>
-            <nav class="flex gap-1 glass p-1">
-                <button onclick="showPage(0)" class="px-4 py-1 text-[10px] font-bold rounded-lg">HOME</button>
-                <button onclick="showPage(1)" class="px-4 py-1 text-[10px] font-bold rounded-lg">MUSIC</button>
+            <label class="cursor-pointer glass px-4 py-2 text-[10px] font-bold text-slate-500 hover:bg-slate-50 transition-colors">
+                LOAD VRM
+                <input type="file" id="vrm-upload" class="hidden" accept=".vrm">
+            </label>
+            
+            <nav class="flex gap-1 glass p-1 ml-4">
+                <button onclick="showPage(0)" class="px-4 py-1 text-[10px] font-bold rounded-lg hover:text-[#39c5bb]">HOME</button>
+                <button onclick="showPage(1)" class="px-4 py-1 text-[10px] font-bold rounded-lg hover:text-[#39c5bb]">MUSIC</button>
             </nav>
         </div>
     </div>
 
     <main class="relative z-10 max-w-5xl mx-auto pt-40 px-6">
-        <div class="flex justify-center mb-16">
-            <div class="glass p-2 flex items-center shadow-xl w-full max-w-2xl">
-                <select id="engine" class="bg-transparent text-xs ml-4 pr-4 outline-none border-r border-slate-200 cursor-pointer text-slate-500 font-bold">
+        
+        <div class="flex justify-center mb-20">
+            <div class="glass p-2 flex items-center shadow-xl focus-within:ring-2 focus-within:ring-[#39c5bb]/30 transition-all w-full max-w-2xl">
+                <select id="engine" class="bg-transparent text-xs ml-4 pr-4 outline-none border-r border-slate-200 cursor-pointer text-slate-500 font-bold uppercase">
                     <option value="https://www.bing.com/search?q=" selected>BING</option>
                     <option value="https://www.google.com/search?q=">GOOGLE</option>
                     <option value="https://grok.com/?q=">GROK</option>
-                    <option value="https://search.bilibili.com/all?keyword=">BILIBILI</option>
-                    <option value="https://yandex.com/search/?text=">YANDEX</option>
+                    <option value="https://github.com/search?q=">GITHUB</option>
                 </select>
-                <input type="text" id="search-input" autofocus placeholder="Search..." class="bg-transparent w-full px-6 py-4 outline-none text-xl text-slate-800">
+                <input type="text" id="search-input" autofocus 
+                       placeholder="Search your multiverse..." 
+                       class="bg-transparent w-full px-6 py-4 outline-none text-xl text-slate-800 placeholder-slate-300">
             </div>
         </div>
 
         <div id="page-0" class="page-content page-active">
-            <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
-                <a href="https://twitter.com" class="glass p-4 flex flex-col items-center nav-card group">
-                    <img src="https://cdn.simpleicons.org/x/000000" class="w-7 h-7 mb-2">
-                    <span class="text-[9px] font-bold text-slate-400">TWITTER</span>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                <a href="https://www.bilibili.com" class="glass p-5 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/bilibili/00AEEC" class="w-8 h-8 mb-3">
+                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">BILIBILI</span>
                 </a>
-                <a href="https://spotify.com" class="glass p-4 flex flex-col items-center nav-card group">
-                    <img src="https://cdn.simpleicons.org/spotify/1DB954" class="w-7 h-7 mb-2">
-                    <span class="text-[9px] font-bold text-slate-400">SPOTIFY</span>
+                
+                <a href="https://grok.com" class="glass p-5 flex flex-col items-center nav-card group">
+                    <img src="https://api.iconify.design/lucide:brain.svg?color=%23000000" class="w-8 h-8 mb-3">
+                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">GROK</span>
                 </a>
-                <a href="https://grok.com" class="glass p-4 flex flex-col items-center nav-card group">
-                    <img src="https://cdn.simpleicons.org/grok/000000" class="w-7 h-7 mb-2">
-                    <span class="text-[9px] font-bold text-slate-400">GROK</span>
+                
+                <a href="https://twitter.com" class="glass p-5 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/x/000000" class="w-8 h-8 mb-3">
+                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">TWITTER</span>
                 </a>
-                <a href="https://bilibili.com" class="glass p-4 flex flex-col items-center nav-card group">
-                    <img src="https://cdn.simpleicons.org/bilibili/00AEEC" class="w-7 h-7 mb-2">
-                    <span class="text-[9px] font-bold text-slate-400">BILIBILI</span>
+
+                <a href="https://open.spotify.com" class="glass p-5 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/spotify/1DB954" class="w-8 h-8 mb-3">
+                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">SPOTIFY</span>
                 </a>
-                <a href="https://t.me" class="glass p-4 flex flex-col items-center nav-card group">
-                    <img src="https://cdn.simpleicons.org/telegram/26A5E4" class="w-7 h-7 mb-2">
-                    <span class="text-[9px] font-bold text-slate-400 text-center leading-tight">TELEGRAM</span>
+
+                <a href="https://youtube.com" class="glass p-5 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/youtube/FF0000" class="w-8 h-8 mb-3">
+                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">YOUTUBE</span>
                 </a>
-                <a href="https://linux.do" class="glass p-4 flex flex-col items-center nav-card group">
-                    <img src="https://cdn.simpleicons.org/linux/black" class="w-7 h-7 mb-2">
-                    <span class="text-[9px] font-bold text-slate-400">LINUX.DO</span>
+                <a href="https://t.me" class="glass p-5 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/telegram/26A5E4" class="w-8 h-8 mb-3">
+                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">TELEGRAM</span>
+                </a>
+                <a href="https://discord.com" class="glass p-5 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/discord/5865F2" class="w-8 h-8 mb-3">
+                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">DISCORD</span>
+                </a>
+                <a href="https://linux.do" class="glass p-5 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/linux/black" class="w-8 h-8 mb-3">
+                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">LINUX.DO</span>
+                </a>
+                <a href="https://gemini.google.com" class="glass p-5 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/googlegemini/4285F4" class="w-8 h-8 mb-3">
+                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">GEMINI</span>
+                </a>
+                <a href="https://bgm.tv" class="glass p-5 flex flex-col items-center nav-card group">
+                    <img src="https://cdn.simpleicons.org/anilist/F09199" class="w-8 h-8 mb-3">
+                    <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800">BANGUMI</span>
                 </a>
             </div>
         </div>
 
         <div id="page-1" class="page-content">
             <div class="glass p-10 flex flex-col items-center max-w-xl mx-auto">
-                <h3 class="text-xl font-black text-[#39c5bb] mb-8">VOCALOID_PLAYER</h3>
+                <div class="w-32 h-32 rounded-full border-4 border-[#39c5bb] overflow-hidden mb-6 animate-spin-slow shadow-inner">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=shiki" class="w-full h-full">
+                </div>
+                <h3 class="text-xl font-black text-[#39c5bb] mb-8 tracking-tighter">NOW PLAYING</h3>
+                
                 <div class="w-full space-y-2 mb-8">
-                    <div onclick="playMusic('./song1.mp3')" class="flex justify-between text-xs font-bold glass p-4 hover:bg-slate-50 cursor-pointer">
-                        <span>1. 初音ミク - 消失</span>
-                        <span class="opacity-30">PLAY</span>
+                    <div class="flex justify-between text-xs font-bold glass p-4 border border-[#39c5bb]/30">
+                        <span id="track-name">shiki - lapis</span>
+                        <span class="text-[#39c5bb]">♪</span>
                     </div>
                 </div>
-                <audio id="bgm" controls class="w-full h-10 opacity-50"></audio>
+
+                <div class="flex gap-4">
+                    <label class="cursor-pointer px-6 py-3 glass text-slate-500 font-black text-xs tracking-widest hover:bg-slate-50 transition-all">
+                        UPLOAD MUSIC
+                        <input type="file" id="music-upload" class="hidden" accept="audio/*">
+                    </label>
+                    <button onclick="toggleMusic()" class="px-8 py-3 glass text-[#39c5bb] font-black text-xs tracking-widest hover:bg-slate-50 transition-all">PLAY / PAUSE</button>
+                </div>
+                <audio id="bgm" loop src="./lapis.mp3"></audio>
             </div>
         </div>
     </main>
 
     <script>
-        function showPage(i) { document.querySelectorAll('.page-content').forEach((p, idx) => p.classList.toggle('page-active', idx === i)); }
+        // --- 1. 分页控制 ---
+        function showPage(index) {
+            document.querySelectorAll('.page-content').forEach((p, i) => {
+                p.classList.toggle('page-active', i === index);
+            });
+        }
 
+        // --- 2. 搜索引擎 ---
         const input = document.getElementById('search-input');
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && input.value.trim()) {
-                window.location.href = document.getElementById('engine').value + encodeURIComponent(input.value);
+                const engine = document.getElementById('engine').value;
+                window.location.href = engine + encodeURIComponent(input.value);
             }
         });
 
-        // 背景修复
+        // --- 3. 背景持久化 ---
         const bgContainer = document.getElementById('bg-container');
         const savedBg = localStorage.getItem('custom-bg');
         if (savedBg) bgContainer.style.backgroundImage = `url(${savedBg})`;
+
         document.getElementById('bg-upload').addEventListener('change', (e) => {
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                bgContainer.style.backgroundImage = `url(${ev.target.result})`;
-                localStorage.setItem('custom-bg', ev.target.result);
-            };
-            reader.readAsDataURL(e.target.files[0]);
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const base64 = ev.target.result;
+                    bgContainer.style.backgroundImage = `url(${base64})`;
+                    localStorage.setItem('custom-bg', base64);
+                };
+                reader.readAsDataURL(file);
+            }
         });
 
-        // 音乐播放
-        function playMusic(src) {
-            const bgm = document.getElementById('bgm');
-            bgm.src = src;
-            bgm.play();
+        // --- 4. 音乐上传与播放 ---
+        const bgm = document.getElementById('bgm');
+        function toggleMusic() {
+            bgm.paused ? bgm.play() : bgm.pause();
         }
 
-        // VRM 修复：确保相对路径正确
+        document.getElementById('music-upload').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                bgm.src = url;
+                bgm.play();
+                document.getElementById('track-name').innerText = file.name.replace(/\.[^/.]+$/, ""); // 去掉后缀名
+            }
+        });
+
+        // --- 5. VRM 3D 模型动态加载 (修复本地加载无反应问题) ---
         const container = document.getElementById('vrm-container');
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(30, container.clientWidth/container.clientHeight, 0.1, 100);
+        const camera = new THREE.PerspectiveCamera(30, container.clientWidth / container.clientHeight, 0.1, 100);
         camera.position.set(0, 1.4, 3.5);
+
         const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
         container.appendChild(renderer.domElement);
+
         scene.add(new THREE.DirectionalLight(0xffffff, 1.0));
         scene.add(new THREE.AmbientLight(0xffffff, 0.5));
 
+        let currentVrm = null;
         const loader = new THREE.GLTFLoader();
-        // 💡 重点：这里直接写文件名，确保你上传到 GitHub 的文件也叫这个名字
-        loader.load('./mascot.vrm', (gltf) => {
-            THREE.VRM.from(gltf).then((vrm) => {
-                scene.add(vrm.scene);
-                vrm.scene.rotation.y = Math.PI;
-                window.vrm = vrm;
-            });
-        }, undefined, (e) => console.error("VRM 加载失败:", e));
 
+        // 核心：封装加载逻辑，支持动态 URL
+        function loadVRM(url) {
+            loader.load(url, (gltf) => {
+                // 如果场景里已经有模型，先清理掉
+                if (currentVrm) {
+                    scene.remove(currentVrm.scene);
+                    THREE.VRMUtils.deepDispose(currentVrm.scene);
+                }
+                
+                THREE.VRMUtils.removeUnusedVertices(gltf.scene);
+                THREE.VRM.from(gltf).then((vrm) => {
+                    scene.add(vrm.scene);
+                    currentVrm = vrm;
+                    vrm.scene.rotation.y = Math.PI; // 调整面向
+                });
+            }, undefined, (err) => console.log("VRM加载错误:", err));
+        }
+
+        // 默认尝试加载同目录下的模型，如果跨域失败则静默
+        loadVRM('./mascot.vrm');
+
+        // 监听上传按钮，生成本地 URL 给加载器
+        document.getElementById('vrm-upload').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                loadVRM(url);
+            }
+        });
+
+        // 动画循环
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
-            if (window.vrm) window.vrm.update(clock.getDelta());
+            if (currentVrm) {
+                const t = clock.getElapsedTime();
+                // 简单的呼吸/摆臂动画测试
+                currentVrm.humanoid.getNormalizedBoneNode('leftUpperArm').rotation.z = Math.sin(t) * 0.05 + 1.2;
+                currentVrm.humanoid.getNormalizedBoneNode('rightUpperArm').rotation.z = -Math.sin(t) * 0.05 - 1.2;
+                currentVrm.update(clock.getDelta());
+            }
             renderer.render(scene, camera);
         }
         animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
     </script>
 </body>
 </html>
